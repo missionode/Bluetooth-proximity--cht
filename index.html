@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bluetooth Proximity Chat - Connect and chat with people nearby">
+    <meta name="theme-color" content="#6366f1">
+    <title>Proximity Chat</title>
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Proximity Chat">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Install Toast Notification -->
+    <div id="installToast" class="toast hidden">
+        <div class="toast-content">
+            <p>Install this app for a better experience</p>
+            <div class="toast-buttons">
+                <button id="installBtn" class="btn-primary">Install</button>
+                <button id="dismissToast" class="btn-secondary">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container">
+
+        <!-- Screen 1: Profile Setup -->
+        <div id="profileSetupScreen" class="screen active">
+            <div class="screen-content">
+                <h1>Welcome to Proximity Chat</h1>
+                <p class="warning-text">⚠️ Your info will be deleted when session ends</p>
+
+                <div class="profile-setup-form">
+                    <div class="form-group">
+                        <label for="userName">Your Name</label>
+                        <input
+                            type="text"
+                            id="userName"
+                            placeholder="Enter your name"
+                            maxlength="50"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="camera-section">
+                        <label>Take Your Photo</label>
+                        <div id="cameraPreview" class="camera-preview">
+                            <video id="cameraVideo" autoplay playsinline></video>
+                            <canvas id="photoCanvas" class="hidden"></canvas>
+                            <img id="capturedPhoto" class="hidden" alt="Captured photo">
+                        </div>
+
+                        <div class="camera-controls">
+                            <button id="captureBtn" class="btn-primary">
+                                <span class="icon">📷</span> Capture Photo
+                            </button>
+                            <button id="retakeBtn" class="btn-secondary hidden">
+                                <span class="icon">🔄</span> Retake
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="continueBtn" class="btn-large btn-primary" disabled>
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 2: Discovery/Home -->
+        <div id="discoveryScreen" class="screen">
+            <div class="screen-header">
+                <div class="user-profile-mini">
+                    <img id="headerUserPhoto" class="user-avatar-small" alt="Your photo">
+                    <span id="headerUserName">Your Name</span>
+                </div>
+                <button id="refreshBtn" class="btn-icon" title="Refresh">
+                    <span class="icon">🔄</span>
+                </button>
+            </div>
+
+            <div class="screen-content">
+                <h2>Nearby Users</h2>
+                <p class="status-text" id="scanStatus">Scanning for nearby users...</p>
+
+                <div id="nearbyUsersList" class="users-list">
+                    <!-- Users will be dynamically added here -->
+                </div>
+
+                <div id="emptyState" class="empty-state">
+                    <p class="icon-large">📡</p>
+                    <p>No users nearby</p>
+                    <p class="small-text">Make sure Bluetooth is enabled</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Connection Request Dialog -->
+        <div id="connectionRequestDialog" class="dialog hidden">
+            <div class="dialog-overlay"></div>
+            <div class="dialog-content">
+                <h3>Connection Request</h3>
+                <div class="request-user-info">
+                    <img id="requestUserPhoto" class="user-avatar-large" alt="User photo">
+                    <p id="requestUserName" class="user-name-large">User Name</p>
+                </div>
+                <p id="requestMessage">wants to connect with you</p>
+                <div class="dialog-buttons">
+                    <button id="acceptRequestBtn" class="btn-primary">Accept</button>
+                    <button id="rejectRequestBtn" class="btn-secondary">Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 4: Chat -->
+        <div id="chatScreen" class="screen">
+            <div class="chat-header">
+                <button id="backToDiscoveryBtn" class="btn-icon">
+                    <span class="icon">←</span>
+                </button>
+                <div class="chat-user-info">
+                    <img id="chatUserPhoto" class="user-avatar-small" alt="User photo">
+                    <div>
+                        <span id="chatUserName" class="user-name">User Name</span>
+                        <span id="chatStatus" class="status-indicator">Connected</span>
+                    </div>
+                </div>
+                <button id="disconnectBtn" class="btn-icon" title="Disconnect">
+                    <span class="icon">🔌</span>
+                </button>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be dynamically added here -->
+            </div>
+
+            <div id="typingIndicator" class="typing-indicator hidden">
+                <span class="typing-dots">
+                    <span>.</span><span>.</span><span>.</span>
+                </span>
+                <span id="typingUserName">User</span> is typing...
+            </div>
+
+            <div class="chat-input-container">
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Type a message..."
+                    maxlength="1000"
+                    autocomplete="off"
+                >
+                <button id="sendMessageBtn" class="btn-primary" disabled>
+                    <span class="icon">➤</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p id="loadingMessage">Loading...</p>
+        </div>
+
+        <!-- Error Toast -->
+        <div id="errorToast" class="toast toast-error hidden">
+            <div class="toast-content">
+                <p id="errorMessage">An error occurred</p>
+                <button id="dismissError" class="btn-secondary">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js" type="module"></script>
+</body>
+</html>

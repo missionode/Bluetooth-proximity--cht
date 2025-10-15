@@ -1,0 +1,284 @@
+{
+  "project_name": "Bluetooth Proximity Chat",
+  "project_description": "A proximity-based chat application that uses Bluetooth to discover and connect nearby users for peer-to-peer messaging",
+
+  "core_features": {
+    "temporary_sessions": {
+      "description": "Every discovery creates a temporary session with no persistent data",
+      "details": [
+        "No data stored after session ends",
+        "User must enter name and take a live photo each time they open the app",
+        "Photo is captured using device camera in real-time (not from gallery)",
+        "All chat history deleted when app closes or session ends",
+        "No user profiles saved locally",
+        "Complete privacy - nothing persists between sessions",
+        "Fresh start every time"
+      ]
+    },
+    "bluetooth_discovery": {
+      "description": "Scan and discover nearby devices running the same application",
+      "details": [
+        "Enable Bluetooth on app launch",
+        "Continuous scanning for nearby devices",
+        "Display device signal strength/proximity indicator",
+        "Auto-refresh nearby users list"
+      ]
+    },
+    "user_discovery": {
+      "description": "Show a list of all discoverable users within Bluetooth range",
+      "details": [
+        "Real-time list of nearby users",
+        "Display user profile information (username, avatar)",
+        "Show connection status (available, pending, connected)",
+        "Distance/proximity indicator"
+      ]
+    },
+    "mutual_consent_system": {
+      "description": "Two-way approval system before establishing connection",
+      "details": [
+        "User A sends connection request to User B",
+        "User B receives notification with request details",
+        "User B can accept or reject the request",
+        "Connection only established when both parties approve",
+        "Ability to revoke/disconnect at any time",
+        "Consent status tracking"
+      ]
+    },
+    "bluetooth_networking": {
+      "description": "Peer-to-peer Bluetooth network for direct communication",
+      "details": [
+        "Create/join Bluetooth network",
+        "Direct device-to-device communication",
+        "No internet required",
+        "Support multiple simultaneous connections",
+        "Handle connection drops and reconnections"
+      ]
+    },
+    "chat_functionality": {
+      "description": "Real-time messaging between connected users",
+      "details": [
+        "One-on-one chat interface",
+        "Send and receive text messages",
+        "Message delivery status (sent, delivered, read)",
+        "Chat history (in-memory only, not persisted)",
+        "Typing indicators",
+        "Message timestamps",
+        "All messages deleted when session ends"
+      ]
+    }
+  },
+
+  "user_flow": {
+    "steps": [
+      {
+        "step": 1,
+        "action": "App Launch",
+        "description": "User opens the app and grants Bluetooth permissions"
+      },
+      {
+        "step": 2,
+        "action": "Enter Profile",
+        "description": "User enters their name and takes a live photo using the camera for this session only"
+      },
+      {
+        "step": 3,
+        "action": "Discovery",
+        "description": "App automatically scans for nearby devices running the same app"
+      },
+      {
+        "step": 4,
+        "action": "View Nearby Users",
+        "description": "User sees a list of all discoverable users within Bluetooth range"
+      },
+      {
+        "step": 5,
+        "action": "Send Connection Request",
+        "description": "User selects someone from the list and sends a connection request"
+      },
+      {
+        "step": 6,
+        "action": "Request Notification",
+        "description": "Recipient receives a notification about the incoming connection request"
+      },
+      {
+        "step": 7,
+        "action": "Accept/Reject",
+        "description": "Recipient reviews the request and can accept or reject"
+      },
+      {
+        "step": 8,
+        "action": "Connection Established",
+        "description": "Once both parties consent, Bluetooth connection is established"
+      },
+      {
+        "step": 9,
+        "action": "Start Chatting",
+        "description": "Users can now send and receive messages via Bluetooth"
+      },
+      {
+        "step": 10,
+        "action": "Session End",
+        "description": "When user closes app, all data (profile, chat history, connections) is deleted"
+      }
+    ]
+  },
+
+  "technical_requirements": {
+    "platform": "Progressive Web App (PWA) - Installable on all platforms",
+    "pwa_features": {
+      "installable": "Must be installable to home screen/desktop",
+      "fullscreen_mode": "Runs in fullscreen standalone mode (no browser UI)",
+      "install_prompt": "Toast notification prompting user to install the app",
+      "offline_capability": "Works offline once installed (Bluetooth doesn't need internet)",
+      "manifest": "Web app manifest with app name, icons, theme colors",
+      "service_worker": "Service worker for offline functionality and caching"
+    },
+    "bluetooth_specifications": {
+      "type": "Web Bluetooth API (Bluetooth Low Energy - BLE)",
+      "range": "Typical Bluetooth range (up to 100 meters in open space)",
+      "protocols": "BLE GATT services for data transfer",
+      "browser_support": "Chrome, Edge, Opera (Web Bluetooth API support required)"
+    },
+    "permissions_required": [
+      "Bluetooth (Web Bluetooth API)",
+      "Camera (MediaDevices API for live photo capture)",
+      "Notifications (for connection requests and install prompt)"
+    ],
+    "data_storage": {
+      "user_profile": "In-memory only (RAM) - not persisted",
+      "chat_history": "In-memory only (RAM) - deleted on app close",
+      "connection_history": "In-memory only (RAM) - no tracking between sessions",
+      "session_policy": "All data is temporary and deleted when app closes or session ends"
+    }
+  },
+
+  "ui_requirements": {
+    "screens": [
+      {
+        "name": "Install Prompt (If not installed)",
+        "components": [
+          "Toast notification at top or bottom of screen",
+          "Message: 'Install this app for a better experience'",
+          "Install button",
+          "Dismiss/Close button",
+          "Auto-dismiss after few seconds if user doesn't interact"
+        ]
+      },
+      {
+        "name": "Profile Setup Screen (First Screen)",
+        "components": [
+          "Name input field",
+          "Live camera preview",
+          "Capture photo button",
+          "Retake option if photo already captured",
+          "Continue button (enabled only after name and photo are provided)",
+          "Info text: 'Your info will be deleted when session ends'"
+        ]
+      },
+      {
+        "name": "Home/Discovery Screen",
+        "components": [
+          "List of nearby users",
+          "Refresh button",
+          "Current user profile section (session only)",
+          "Connection status indicator"
+        ]
+      },
+      {
+        "name": "Connection Request Screen",
+        "components": [
+          "User information",
+          "Accept/Reject buttons",
+          "Request message/details"
+        ]
+      },
+      {
+        "name": "Chat Screen",
+        "components": [
+          "Message list",
+          "Text input field",
+          "Send button",
+          "User info header",
+          "Disconnect option",
+          "Session indicator"
+        ]
+      }
+    ]
+  },
+
+  "security_and_privacy": {
+    "considerations": [
+      "ZERO data persistence - complete privacy",
+      "User can choose to be discoverable or invisible",
+      "No user tracking or history",
+      "Encrypted message transmission",
+      "No data leaves the device except via Bluetooth",
+      "Clear consent mechanism",
+      "Easy way to revoke connections",
+      "All data wiped on app close - maximum anonymity",
+      "No analytics, no telemetry, no logging"
+    ]
+  },
+
+  "optional_features": {
+    "future_enhancements": [
+      "Group chat support (still temporary)",
+      "File/image sharing over Bluetooth",
+      "Voice messages",
+      "User presence status (available, busy, away)",
+      "Custom profile themes (session only)",
+      "Message reactions/emojis"
+    ]
+  },
+
+  "constraints_and_limitations": {
+    "technical": [
+      "Limited by Bluetooth range",
+      "Connection stability depends on environment",
+      "Number of simultaneous connections limited by device capabilities",
+      "Slower data transfer compared to internet-based chat"
+    ],
+    "platform_specific": [
+      "iOS has stricter Bluetooth background limitations",
+      "Android requires location permission for Bluetooth discovery",
+      "Different Bluetooth APIs across platforms"
+    ]
+  },
+
+  "development_considerations": {
+    "technology_stack": "Progressive Web App (PWA)",
+    "recommended_technologies": [
+      "HTML5, CSS3, JavaScript (or TypeScript)",
+      "Web Bluetooth API for Bluetooth connectivity",
+      "MediaDevices API (getUserMedia) for camera access",
+      "Service Worker for offline functionality",
+      "Web App Manifest (manifest.json)",
+      "IndexedDB or SessionStorage for temporary in-memory data",
+      "Modern frontend framework (React, Vue, or Vanilla JS)"
+    ],
+    "pwa_requirements": [
+      "HTTPS required (PWAs must be served over HTTPS)",
+      "manifest.json with display: 'fullscreen' or 'standalone'",
+      "Service worker registration",
+      "Install prompt handling (beforeinstallprompt event)",
+      "Toast notification for install prompt",
+      "App icons (multiple sizes for different devices)",
+      "Theme color and background color"
+    ],
+    "testing_requirements": [
+      "Multiple physical devices needed for testing",
+      "Test on Chrome, Edge, Opera browsers (Web Bluetooth support)",
+      "Test PWA installation on Android and Desktop",
+      "Test in various proximity ranges",
+      "Test connection stability",
+      "Test fullscreen mode behavior",
+      "Battery consumption testing",
+      "Test install prompt and toast notification"
+    ],
+    "browser_compatibility": {
+      "supported": "Chrome, Edge, Opera (desktop and Android)",
+      "limited_support": "iOS Safari (Web Bluetooth not supported)",
+      "note": "Web Bluetooth API is not available on iOS Safari. iOS users would need to use Chrome/Edge on iOS or wait for Apple to support Web Bluetooth"
+    }
+  }
+}

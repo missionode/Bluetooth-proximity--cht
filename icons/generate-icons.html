@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PWA Icons</title>
+</head>
+<body>
+    <h1>Icon Generator</h1>
+    <p>Open this file in a browser, then right-click each canvas and save as PNG with the specified filename.</p>
+    <div id="icons"></div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const container = document.getElementById('icons');
+
+        sizes.forEach(size => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = '#6366f1';
+            ctx.fillRect(0, 0, size, size);
+
+            // Icon symbol (Bluetooth-like)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('📡', size / 2, size / 2);
+
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '20px';
+
+            const label = document.createElement('p');
+            label.textContent = `icon-${size}.png (${size}x${size})`;
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(canvas);
+            container.appendChild(wrapper);
+        });
+    </script>
+</body>
+</html>

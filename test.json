@@ -1,0 +1,989 @@
+{
+  "test_suite_name": "Bluetooth Proximity Chat - Automated Test Cases",
+  "test_suite_description": "Comprehensive test cases for PWA functionality, Bluetooth connectivity, camera integration, and user interactions",
+
+  "test_categories": {
+    "pwa_installation_tests": {
+      "category": "PWA Installation & Setup",
+      "tests": [
+        {
+          "test_id": "PWA-001",
+          "test_name": "Install Prompt Display",
+          "description": "Verify that install toast notification appears when app is not installed",
+          "preconditions": [
+            "App is accessed via browser",
+            "App is not installed on device",
+            "Browser supports PWA (Chrome, Edge, Opera)"
+          ],
+          "test_steps": [
+            "Open app URL in browser",
+            "Wait for page to fully load",
+            "Observe for install prompt toast notification"
+          ],
+          "expected_result": "Toast notification appears with 'Install this app for a better experience' message and Install/Dismiss buttons",
+          "priority": "High"
+        },
+        {
+          "test_id": "PWA-002",
+          "test_name": "Install App Functionality",
+          "description": "Verify app can be installed to home screen/desktop",
+          "preconditions": [
+            "Install toast notification is visible",
+            "Device has storage space available"
+          ],
+          "test_steps": [
+            "Click 'Install' button on toast notification",
+            "Confirm installation in browser dialog",
+            "Check home screen/desktop for app icon"
+          ],
+          "expected_result": "App is successfully installed and icon appears on home screen/desktop",
+          "priority": "High"
+        },
+        {
+          "test_id": "PWA-003",
+          "test_name": "Fullscreen Mode",
+          "description": "Verify app runs in fullscreen standalone mode without browser UI",
+          "preconditions": [
+            "App is installed",
+            "User launches app from home screen/desktop"
+          ],
+          "test_steps": [
+            "Launch installed app",
+            "Observe app display mode"
+          ],
+          "expected_result": "App opens in fullscreen mode with no browser address bar or navigation buttons visible",
+          "priority": "High"
+        },
+        {
+          "test_id": "PWA-004",
+          "test_name": "Toast Auto-Dismiss",
+          "description": "Verify install toast notification auto-dismisses after timeout",
+          "preconditions": [
+            "App is not installed",
+            "Install toast is visible"
+          ],
+          "test_steps": [
+            "Display install toast notification",
+            "Do not interact with toast",
+            "Wait for configured timeout period (e.g., 10 seconds)"
+          ],
+          "expected_result": "Toast notification automatically dismisses after timeout period",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "PWA-005",
+          "test_name": "Offline Functionality",
+          "description": "Verify app works offline after installation",
+          "preconditions": [
+            "App is installed",
+            "Service worker is registered"
+          ],
+          "test_steps": [
+            "Install and launch app while online",
+            "Close app",
+            "Disable internet connection",
+            "Relaunch app"
+          ],
+          "expected_result": "App launches successfully offline and all core features work (except initial load)",
+          "priority": "High"
+        },
+        {
+          "test_id": "PWA-006",
+          "test_name": "HTTPS Requirement",
+          "description": "Verify app is served over HTTPS",
+          "preconditions": [
+            "App is deployed"
+          ],
+          "test_steps": [
+            "Check URL protocol in browser address bar",
+            "Inspect SSL certificate"
+          ],
+          "expected_result": "App URL starts with https:// and has valid SSL certificate",
+          "priority": "Critical"
+        }
+      ]
+    },
+
+    "permissions_tests": {
+      "category": "Permissions & Access",
+      "tests": [
+        {
+          "test_id": "PERM-001",
+          "test_name": "Bluetooth Permission Request",
+          "description": "Verify app requests Bluetooth permission on first launch",
+          "preconditions": [
+            "App is launched for first time",
+            "Bluetooth permission not previously granted"
+          ],
+          "test_steps": [
+            "Launch app",
+            "Observe permission request dialog"
+          ],
+          "expected_result": "Browser shows Bluetooth permission request dialog",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "PERM-002",
+          "test_name": "Camera Permission Request",
+          "description": "Verify app requests camera permission when user reaches profile setup",
+          "preconditions": [
+            "User reaches profile setup screen",
+            "Camera permission not previously granted"
+          ],
+          "test_steps": [
+            "Navigate to profile setup screen",
+            "Observe permission request"
+          ],
+          "expected_result": "Browser shows camera permission request dialog",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "PERM-003",
+          "test_name": "Notification Permission Request",
+          "description": "Verify app requests notification permission",
+          "preconditions": [
+            "App is launched",
+            "Notification permission not previously granted"
+          ],
+          "test_steps": [
+            "Launch app",
+            "Observe notification permission request"
+          ],
+          "expected_result": "Browser shows notification permission request dialog",
+          "priority": "High"
+        },
+        {
+          "test_id": "PERM-004",
+          "test_name": "Permission Denial Handling",
+          "description": "Verify app handles permission denial gracefully",
+          "preconditions": [
+            "Permission request is displayed"
+          ],
+          "test_steps": [
+            "Deny Bluetooth/Camera permission",
+            "Observe app behavior"
+          ],
+          "expected_result": "App shows informative error message and guidance on how to enable permissions",
+          "priority": "High"
+        }
+      ]
+    },
+
+    "profile_setup_tests": {
+      "category": "Profile Setup & Camera",
+      "tests": [
+        {
+          "test_id": "PROF-001",
+          "test_name": "Name Input Validation",
+          "description": "Verify name input field accepts valid names",
+          "preconditions": [
+            "User is on profile setup screen"
+          ],
+          "test_steps": [
+            "Enter valid name (e.g., 'John Doe')",
+            "Check input field displays entered name"
+          ],
+          "expected_result": "Name is accepted and displayed correctly",
+          "priority": "High"
+        },
+        {
+          "test_id": "PROF-002",
+          "test_name": "Empty Name Validation",
+          "description": "Verify continue button is disabled when name is empty",
+          "preconditions": [
+            "User is on profile setup screen"
+          ],
+          "test_steps": [
+            "Leave name field empty",
+            "Attempt to click continue button"
+          ],
+          "expected_result": "Continue button is disabled and cannot be clicked",
+          "priority": "High"
+        },
+        {
+          "test_id": "PROF-003",
+          "test_name": "Live Camera Preview",
+          "description": "Verify camera preview displays live feed",
+          "preconditions": [
+            "Camera permission granted",
+            "Device has working camera"
+          ],
+          "test_steps": [
+            "Navigate to profile setup screen",
+            "Observe camera preview area"
+          ],
+          "expected_result": "Live camera feed is displayed in preview area",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "PROF-004",
+          "test_name": "Capture Photo",
+          "description": "Verify user can capture photo using camera",
+          "preconditions": [
+            "Camera preview is active",
+            "Camera permission granted"
+          ],
+          "test_steps": [
+            "Click 'Capture Photo' button",
+            "Observe captured image"
+          ],
+          "expected_result": "Photo is captured and displayed, replacing camera preview",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "PROF-005",
+          "test_name": "Retake Photo",
+          "description": "Verify user can retake photo if not satisfied",
+          "preconditions": [
+            "Photo has been captured"
+          ],
+          "test_steps": [
+            "Click 'Retake' button",
+            "Observe camera preview returns"
+          ],
+          "expected_result": "Previous photo is discarded and camera preview is reactivated",
+          "priority": "High"
+        },
+        {
+          "test_id": "PROF-006",
+          "test_name": "Continue Button Enabled",
+          "description": "Verify continue button is enabled only when name and photo are provided",
+          "preconditions": [
+            "User is on profile setup screen"
+          ],
+          "test_steps": [
+            "Enter name only - check button state",
+            "Capture photo only - check button state",
+            "Provide both name and photo - check button state"
+          ],
+          "expected_result": "Continue button is disabled until both name and photo are provided, then becomes enabled",
+          "priority": "High"
+        },
+        {
+          "test_id": "PROF-007",
+          "test_name": "Session Warning Display",
+          "description": "Verify warning message about data deletion is displayed",
+          "preconditions": [
+            "User is on profile setup screen"
+          ],
+          "test_steps": [
+            "Observe screen for warning message"
+          ],
+          "expected_result": "Message 'Your info will be deleted when session ends' is clearly visible",
+          "priority": "Medium"
+        }
+      ]
+    },
+
+    "bluetooth_discovery_tests": {
+      "category": "Bluetooth Discovery & Connectivity",
+      "tests": [
+        {
+          "test_id": "BT-001",
+          "test_name": "Bluetooth Scan Start",
+          "description": "Verify Bluetooth scanning starts automatically after profile setup",
+          "preconditions": [
+            "User completes profile setup",
+            "Bluetooth permission granted",
+            "Bluetooth is enabled on device"
+          ],
+          "test_steps": [
+            "Complete profile setup",
+            "Navigate to discovery screen",
+            "Observe scanning status"
+          ],
+          "expected_result": "Bluetooth scanning starts automatically and shows scanning indicator",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "BT-002",
+          "test_name": "Discover Nearby Users",
+          "description": "Verify app discovers nearby users running the same app",
+          "preconditions": [
+            "Multiple devices running the app within Bluetooth range",
+            "All devices have completed profile setup",
+            "Bluetooth is enabled on all devices"
+          ],
+          "test_steps": [
+            "Start app on Device A",
+            "Start app on Device B within Bluetooth range",
+            "Wait for discovery on Device A"
+          ],
+          "expected_result": "Device A shows Device B in nearby users list with name and photo",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "BT-003",
+          "test_name": "Display Signal Strength",
+          "description": "Verify proximity/signal strength indicator is displayed for nearby users",
+          "preconditions": [
+            "Nearby users are discovered"
+          ],
+          "test_steps": [
+            "View nearby users list",
+            "Observe signal strength indicators"
+          ],
+          "expected_result": "Each nearby user shows signal strength/proximity indicator",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "BT-004",
+          "test_name": "Refresh Nearby Users",
+          "description": "Verify refresh button updates nearby users list",
+          "preconditions": [
+            "User is on discovery screen"
+          ],
+          "test_steps": [
+            "Click refresh button",
+            "Observe list update"
+          ],
+          "expected_result": "Nearby users list is refreshed and updated with current nearby devices",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "BT-005",
+          "test_name": "User Leaves Range",
+          "description": "Verify user is removed from list when they leave Bluetooth range",
+          "preconditions": [
+            "Device B is in nearby users list on Device A"
+          ],
+          "test_steps": [
+            "Move Device B out of Bluetooth range",
+            "Wait for list update on Device A"
+          ],
+          "expected_result": "Device B is removed from nearby users list on Device A",
+          "priority": "High"
+        },
+        {
+          "test_id": "BT-006",
+          "test_name": "Bluetooth Disabled Handling",
+          "description": "Verify app handles Bluetooth being disabled",
+          "preconditions": [
+            "App is running with Bluetooth enabled"
+          ],
+          "test_steps": [
+            "Disable Bluetooth on device",
+            "Observe app behavior"
+          ],
+          "expected_result": "App shows error message prompting user to enable Bluetooth",
+          "priority": "High"
+        }
+      ]
+    },
+
+    "connection_request_tests": {
+      "category": "Connection Requests & Mutual Consent",
+      "tests": [
+        {
+          "test_id": "CONN-001",
+          "test_name": "Send Connection Request",
+          "description": "Verify user can send connection request to nearby user",
+          "preconditions": [
+            "Device B is visible in Device A's nearby users list"
+          ],
+          "test_steps": [
+            "On Device A, select Device B from list",
+            "Click connect/send request button",
+            "Observe request status"
+          ],
+          "expected_result": "Connection request is sent and Device B shows as 'pending' on Device A",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "CONN-002",
+          "test_name": "Receive Connection Request",
+          "description": "Verify user receives notification for incoming connection request",
+          "preconditions": [
+            "Device A sends connection request to Device B"
+          ],
+          "test_steps": [
+            "Wait for notification on Device B",
+            "Observe notification content"
+          ],
+          "expected_result": "Device B receives notification showing Device A's name, photo, and request details",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "CONN-003",
+          "test_name": "Accept Connection Request",
+          "description": "Verify connection is established when request is accepted",
+          "preconditions": [
+            "Device B has received connection request from Device A"
+          ],
+          "test_steps": [
+            "On Device B, click 'Accept' button",
+            "Observe connection status on both devices"
+          ],
+          "expected_result": "Connection is established, both devices show 'connected' status, and chat interface opens",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "CONN-004",
+          "test_name": "Reject Connection Request",
+          "description": "Verify connection request can be rejected",
+          "preconditions": [
+            "Device B has received connection request from Device A"
+          ],
+          "test_steps": [
+            "On Device B, click 'Reject' button",
+            "Observe status on both devices"
+          ],
+          "expected_result": "Request is rejected, Device A shows rejection status, no connection established",
+          "priority": "High"
+        },
+        {
+          "test_id": "CONN-005",
+          "test_name": "Multiple Connection Requests",
+          "description": "Verify user can send/receive multiple connection requests",
+          "preconditions": [
+            "Multiple devices in range"
+          ],
+          "test_steps": [
+            "Send connection request to User B",
+            "Send connection request to User C",
+            "Observe pending requests"
+          ],
+          "expected_result": "Multiple requests can be sent and tracked independently",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "CONN-006",
+          "test_name": "Mutual Consent Verification",
+          "description": "Verify connection requires both users' consent",
+          "preconditions": [
+            "Device A sends request to Device B"
+          ],
+          "test_steps": [
+            "Observe connection status before acceptance",
+            "Accept request on Device B",
+            "Observe connection status after acceptance"
+          ],
+          "expected_result": "No connection until Device B accepts; connection established only after acceptance",
+          "priority": "Critical"
+        }
+      ]
+    },
+
+    "chat_functionality_tests": {
+      "category": "Chat & Messaging",
+      "tests": [
+        {
+          "test_id": "CHAT-001",
+          "test_name": "Send Text Message",
+          "description": "Verify user can send text message to connected user",
+          "preconditions": [
+            "Device A and Device B are connected"
+          ],
+          "test_steps": [
+            "On Device A, enter message text",
+            "Click send button",
+            "Observe message on Device A"
+          ],
+          "expected_result": "Message appears in chat history on Device A with 'sent' status",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "CHAT-002",
+          "test_name": "Receive Text Message",
+          "description": "Verify user receives messages from connected user",
+          "preconditions": [
+            "Device A and Device B are connected",
+            "Device A sends message"
+          ],
+          "test_steps": [
+            "Send message from Device A",
+            "Observe message arrival on Device B"
+          ],
+          "expected_result": "Message appears in chat history on Device B in real-time",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "CHAT-003",
+          "test_name": "Message Delivery Status",
+          "description": "Verify message delivery status is updated correctly",
+          "preconditions": [
+            "Devices are connected"
+          ],
+          "test_steps": [
+            "Send message from Device A",
+            "Observe status changes"
+          ],
+          "expected_result": "Message status progresses from 'sent' to 'delivered' to 'read'",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "CHAT-004",
+          "test_name": "Typing Indicator",
+          "description": "Verify typing indicator shows when other user is typing",
+          "preconditions": [
+            "Devices are connected and in chat"
+          ],
+          "test_steps": [
+            "Start typing on Device A",
+            "Observe Device B chat screen"
+          ],
+          "expected_result": "Device B shows typing indicator for Device A",
+          "priority": "Low"
+        },
+        {
+          "test_id": "CHAT-005",
+          "test_name": "Message Timestamp",
+          "description": "Verify messages display timestamp",
+          "preconditions": [
+            "Messages are exchanged"
+          ],
+          "test_steps": [
+            "Send messages",
+            "Observe message timestamps"
+          ],
+          "expected_result": "Each message shows accurate timestamp",
+          "priority": "Low"
+        },
+        {
+          "test_id": "CHAT-006",
+          "test_name": "Empty Message Prevention",
+          "description": "Verify empty messages cannot be sent",
+          "preconditions": [
+            "User is in chat screen"
+          ],
+          "test_steps": [
+            "Leave message input empty",
+            "Try to click send button"
+          ],
+          "expected_result": "Send button is disabled when message is empty",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "CHAT-007",
+          "test_name": "Disconnect from Chat",
+          "description": "Verify user can disconnect from active chat",
+          "preconditions": [
+            "Users are connected and chatting"
+          ],
+          "test_steps": [
+            "Click disconnect button",
+            "Observe connection status"
+          ],
+          "expected_result": "Connection is terminated, both users return to discovery screen",
+          "priority": "High"
+        },
+        {
+          "test_id": "CHAT-008",
+          "test_name": "Connection Loss Handling",
+          "description": "Verify app handles connection loss gracefully",
+          "preconditions": [
+            "Devices are connected and chatting"
+          ],
+          "test_steps": [
+            "Move one device out of Bluetooth range",
+            "Observe app behavior"
+          ],
+          "expected_result": "App detects connection loss and shows error message",
+          "priority": "High"
+        }
+      ]
+    },
+
+    "data_persistence_tests": {
+      "category": "Temporary Sessions & Data Privacy",
+      "tests": [
+        {
+          "test_id": "DATA-001",
+          "test_name": "No Data Persistence on App Close",
+          "description": "Verify all data is deleted when app is closed",
+          "preconditions": [
+            "User has completed profile setup and chatted"
+          ],
+          "test_steps": [
+            "Close/exit the app",
+            "Reopen the app",
+            "Observe app state"
+          ],
+          "expected_result": "App starts fresh - no profile, no chat history, returns to profile setup screen",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "DATA-002",
+          "test_name": "In-Memory Only Storage",
+          "description": "Verify data is stored in memory only (RAM), not in persistent storage",
+          "preconditions": [
+            "App is running with user data"
+          ],
+          "test_steps": [
+            "Inspect browser storage (LocalStorage, IndexedDB, Cookies)",
+            "Check for any user data"
+          ],
+          "expected_result": "No user profile or chat data found in persistent storage",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "DATA-003",
+          "test_name": "Session End - Chat History Deletion",
+          "description": "Verify chat history is deleted when session ends",
+          "preconditions": [
+            "User has exchanged messages"
+          ],
+          "test_steps": [
+            "Close app",
+            "Reopen app",
+            "Navigate through app"
+          ],
+          "expected_result": "No previous chat history is accessible",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "DATA-004",
+          "test_name": "Profile Data Deletion",
+          "description": "Verify user profile (name and photo) is deleted on session end",
+          "preconditions": [
+            "User has created profile"
+          ],
+          "test_steps": [
+            "Note current profile name and photo",
+            "Close app",
+            "Reopen app"
+          ],
+          "expected_result": "Profile setup screen is shown again, no previous data retained",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "DATA-005",
+          "test_name": "No Analytics or Telemetry",
+          "description": "Verify no analytics or telemetry data is sent",
+          "preconditions": [
+            "App is running"
+          ],
+          "test_steps": [
+            "Monitor network traffic using browser dev tools",
+            "Perform various actions in app",
+            "Check for analytics requests"
+          ],
+          "expected_result": "No analytics or telemetry requests are sent to any servers",
+          "priority": "High"
+        },
+        {
+          "test_id": "DATA-006",
+          "test_name": "Fresh Start Every Launch",
+          "description": "Verify each app launch starts fresh",
+          "preconditions": [
+            "App has been used previously"
+          ],
+          "test_steps": [
+            "Launch app multiple times",
+            "Observe initial screen each time"
+          ],
+          "expected_result": "Every launch shows profile setup screen, no data from previous sessions",
+          "priority": "High"
+        }
+      ]
+    },
+
+    "ui_ux_tests": {
+      "category": "User Interface & Experience",
+      "tests": [
+        {
+          "test_id": "UI-001",
+          "test_name": "Responsive Design - Mobile",
+          "description": "Verify app is responsive on mobile devices",
+          "preconditions": [
+            "App is accessed on mobile device"
+          ],
+          "test_steps": [
+            "Open app on mobile device",
+            "Navigate through all screens",
+            "Test all interactive elements"
+          ],
+          "expected_result": "All UI elements are properly sized and accessible on mobile screens",
+          "priority": "High"
+        },
+        {
+          "test_id": "UI-002",
+          "test_name": "Responsive Design - Desktop",
+          "description": "Verify app is responsive on desktop",
+          "preconditions": [
+            "App is accessed on desktop browser"
+          ],
+          "test_steps": [
+            "Open app in desktop browser",
+            "Resize browser window",
+            "Test all screens"
+          ],
+          "expected_result": "App adapts to different screen sizes and remains functional",
+          "priority": "High"
+        },
+        {
+          "test_id": "UI-003",
+          "test_name": "Session Indicator Visibility",
+          "description": "Verify session indicator is visible in chat screen",
+          "preconditions": [
+            "User is in active chat"
+          ],
+          "test_steps": [
+            "Observe chat screen",
+            "Look for session indicator"
+          ],
+          "expected_result": "Session indicator is visible showing active session status",
+          "priority": "Low"
+        },
+        {
+          "test_id": "UI-004",
+          "test_name": "Loading States",
+          "description": "Verify loading indicators are shown during async operations",
+          "preconditions": [
+            "App is performing async operation"
+          ],
+          "test_steps": [
+            "Trigger Bluetooth scan",
+            "Send connection request",
+            "Send message",
+            "Observe loading states"
+          ],
+          "expected_result": "Loading indicators are shown for all async operations",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "UI-005",
+          "test_name": "Error Message Display",
+          "description": "Verify error messages are user-friendly and helpful",
+          "preconditions": [
+            "Error condition occurs"
+          ],
+          "test_steps": [
+            "Trigger various error scenarios",
+            "Observe error messages"
+          ],
+          "expected_result": "Clear, user-friendly error messages with guidance on resolution",
+          "priority": "Medium"
+        }
+      ]
+    },
+
+    "browser_compatibility_tests": {
+      "category": "Browser Compatibility",
+      "tests": [
+        {
+          "test_id": "BROWSER-001",
+          "test_name": "Chrome Compatibility",
+          "description": "Verify app works correctly in Chrome browser",
+          "preconditions": [
+            "Latest version of Chrome installed"
+          ],
+          "test_steps": [
+            "Open app in Chrome",
+            "Test all core features"
+          ],
+          "expected_result": "All features work correctly in Chrome",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "BROWSER-002",
+          "test_name": "Edge Compatibility",
+          "description": "Verify app works correctly in Edge browser",
+          "preconditions": [
+            "Latest version of Edge installed"
+          ],
+          "test_steps": [
+            "Open app in Edge",
+            "Test all core features"
+          ],
+          "expected_result": "All features work correctly in Edge",
+          "priority": "High"
+        },
+        {
+          "test_id": "BROWSER-003",
+          "test_name": "Opera Compatibility",
+          "description": "Verify app works correctly in Opera browser",
+          "preconditions": [
+            "Latest version of Opera installed"
+          ],
+          "test_steps": [
+            "Open app in Opera",
+            "Test all core features"
+          ],
+          "expected_result": "All features work correctly in Opera",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "BROWSER-004",
+          "test_name": "Unsupported Browser Detection",
+          "description": "Verify app detects and notifies users of unsupported browsers",
+          "preconditions": [
+            "App is accessed in browser without Web Bluetooth support (e.g., iOS Safari)"
+          ],
+          "test_steps": [
+            "Open app in unsupported browser",
+            "Observe notification"
+          ],
+          "expected_result": "App shows message indicating browser is not supported and suggests alternatives",
+          "priority": "High"
+        }
+      ]
+    },
+
+    "performance_tests": {
+      "category": "Performance & Optimization",
+      "tests": [
+        {
+          "test_id": "PERF-001",
+          "test_name": "App Load Time",
+          "description": "Verify app loads within acceptable time",
+          "preconditions": [
+            "Good internet connection"
+          ],
+          "test_steps": [
+            "Clear browser cache",
+            "Load app URL",
+            "Measure time to interactive"
+          ],
+          "expected_result": "App becomes interactive within 3 seconds",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "PERF-002",
+          "test_name": "Bluetooth Scan Performance",
+          "description": "Verify Bluetooth scanning doesn't freeze UI",
+          "preconditions": [
+            "App is scanning for devices"
+          ],
+          "test_steps": [
+            "Start Bluetooth scan",
+            "Interact with UI during scan"
+          ],
+          "expected_result": "UI remains responsive during Bluetooth scanning",
+          "priority": "High"
+        },
+        {
+          "test_id": "PERF-003",
+          "test_name": "Battery Consumption",
+          "description": "Verify app doesn't excessively drain battery",
+          "preconditions": [
+            "App running on mobile device",
+            "Battery monitoring enabled"
+          ],
+          "test_steps": [
+            "Run app for extended period",
+            "Monitor battery usage"
+          ],
+          "expected_result": "Battery consumption is within acceptable range for Bluetooth app",
+          "priority": "Medium"
+        },
+        {
+          "test_id": "PERF-004",
+          "test_name": "Message Delivery Speed",
+          "description": "Verify messages are delivered quickly over Bluetooth",
+          "preconditions": [
+            "Devices are connected"
+          ],
+          "test_steps": [
+            "Send message from Device A",
+            "Measure time until received on Device B"
+          ],
+          "expected_result": "Messages are delivered within 1-2 seconds",
+          "priority": "Medium"
+        }
+      ]
+    },
+
+    "security_tests": {
+      "category": "Security & Privacy",
+      "tests": [
+        {
+          "test_id": "SEC-001",
+          "test_name": "Encrypted Message Transmission",
+          "description": "Verify messages are encrypted during Bluetooth transmission",
+          "preconditions": [
+            "Devices are connected and chatting"
+          ],
+          "test_steps": [
+            "Send messages between devices",
+            "Monitor Bluetooth traffic (if possible)",
+            "Check for encryption"
+          ],
+          "expected_result": "Messages are encrypted during transmission",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "SEC-002",
+          "test_name": "No Data Leakage",
+          "description": "Verify no user data is sent to external servers",
+          "preconditions": [
+            "App is running"
+          ],
+          "test_steps": [
+            "Monitor all network traffic",
+            "Perform all app actions",
+            "Check for data transmission"
+          ],
+          "expected_result": "No user data is sent outside of Bluetooth connection",
+          "priority": "Critical"
+        },
+        {
+          "test_id": "SEC-003",
+          "test_name": "Connection Revocation",
+          "description": "Verify user can revoke connection at any time",
+          "preconditions": [
+            "Users are connected"
+          ],
+          "test_steps": [
+            "Click disconnect option",
+            "Attempt to send message after disconnect"
+          ],
+          "expected_result": "Connection is immediately terminated and messages cannot be sent",
+          "priority": "High"
+        },
+        {
+          "test_id": "SEC-004",
+          "test_name": "Discoverable Mode Control",
+          "description": "Verify user can control discoverable/invisible mode",
+          "preconditions": [
+            "User is on discovery screen"
+          ],
+          "test_steps": [
+            "Toggle discoverable/invisible mode",
+            "Check if user appears in other devices' nearby list"
+          ],
+          "expected_result": "User can control visibility to other users",
+          "priority": "High"
+        }
+      ]
+    }
+  },
+
+  "test_execution_notes": {
+    "required_devices": "Minimum 2 physical devices with Bluetooth and camera support",
+    "supported_browsers": "Chrome, Edge, Opera (latest versions)",
+    "test_environment": "HTTPS server required for PWA and Web Bluetooth API",
+    "automation_potential": "Many UI tests can be automated using Selenium/Playwright, but Bluetooth tests require physical devices",
+    "manual_testing_required": [
+      "Bluetooth connectivity tests",
+      "Camera capture tests",
+      "Cross-device communication tests",
+      "Battery consumption tests"
+    ],
+    "priority_levels": {
+      "Critical": "Must pass before release",
+      "High": "Should pass before release",
+      "Medium": "Important but can be addressed post-release",
+      "Low": "Nice to have, can be deferred"
+    }
+  },
+
+  "test_summary": {
+    "total_test_cases": 71,
+    "breakdown_by_category": {
+      "PWA Installation Tests": 6,
+      "Permissions Tests": 4,
+      "Profile Setup Tests": 7,
+      "Bluetooth Discovery Tests": 6,
+      "Connection Request Tests": 6,
+      "Chat Functionality Tests": 8,
+      "Data Persistence Tests": 6,
+      "UI/UX Tests": 5,
+      "Browser Compatibility Tests": 4,
+      "Performance Tests": 4,
+      "Security Tests": 4
+    },
+    "estimated_testing_time": "40-50 hours for complete manual testing",
+    "automation_coverage_potential": "Approximately 40-50% (UI and flow tests)"
+  }
+}
