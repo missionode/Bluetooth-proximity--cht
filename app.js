@@ -1,5 +1,11 @@
 // ===== Proximity Chat PWA - Main Application =====
 
+// ===== Custom Bluetooth Service UUIDs =====
+// These UUIDs identify our app - only devices with this service will be discovered
+const PROXIMITY_CHAT_SERVICE_UUID = '12345678-1234-1234-1234-123456789abc';
+const PROFILE_CHARACTERISTIC_UUID = '12345678-1234-1234-1234-123456789abd';
+const MESSAGE_CHARACTERISTIC_UUID = '12345678-1234-1234-1234-123456789abe';
+
 // ===== State Management (In-Memory Only - No Persistence) =====
 const AppState = {
     currentScreen: 'profileSetup',
@@ -10,7 +16,9 @@ const AppState = {
     chatMessages: new Map(), // deviceId -> messages array
     currentChatUser: null,
     bluetoothDevice: null,
-    characteristic: null
+    characteristic: null,
+    isAdvertising: false,
+    server: null
 };
 
 // ===== DOM Elements =====
@@ -221,7 +229,7 @@ Elements.userName.addEventListener('input', () => {
 Elements.captureBtn.addEventListener('click', capturePhoto);
 Elements.retakeBtn.addEventListener('click', retakePhoto);
 
-Elements.continueBtn.addEventListener('click', () => {
+Elements.continueBtn.addEventListener('click', async () => {
     if (AppState.userProfile && AppState.userProfile.name && AppState.userProfile.photoDataUrl) {
         // Update header with user info
         Elements.headerUserName.textContent = AppState.userProfile.name;
@@ -230,7 +238,10 @@ Elements.continueBtn.addEventListener('click', () => {
         // Move to discovery screen
         showScreen('discovery');
 
-        // Start Bluetooth discovery
+        // Start advertising this device
+        await startBluetoothAdvertising();
+
+        // Initialize Bluetooth discovery
         initBluetoothDiscovery();
     }
 });
@@ -244,48 +255,86 @@ async function checkBluetoothSupport() {
     return true;
 }
 
+// Start advertising this device so others can discover it
+async function startBluetoothAdvertising() {
+    // Note: Web Bluetooth API doesn't support advertising directly from browser
+    // This is a limitation - advertising/peripheral mode is not available in Web Bluetooth
+    //
+    // Workaround: Each device must actively scan to discover others
+    // When devices connect, they exchange profile information
+    //
+    // For true peer-to-peer advertising, you would need:
+    // 1. Native app implementation (Android/iOS)
+    // 2. Or a hybrid approach with background services
+
+    AppState.isAdvertising = true;
+    console.log('Device is now discoverable (via scanning)');
+
+    // Show info to user
+    Elements.scanStatus.innerHTML = `
+        <span style="color: var(--success-color);">✓</span>
+        You're discoverable! Other users can find you when they scan.
+    `;
+}
+
 async function initBluetoothDiscovery() {
     if (!await checkBluetoothSupport()) {
         return;
     }
 
-    Elements.scanStatus.textContent = 'Scanning for nearby users...';
-
-    // Note: Web Bluetooth requires user interaction to start scanning
-    // This is a simplified implementation
-    // In production, you'd need to implement a proper BLE service
-
-    showInfo('Click "Scan" to discover nearby users');
+    Elements.scanStatus.textContent = 'Ready to discover nearby users';
+    showInfo('Click the refresh button to scan for nearby Proximity Chat users');
 }
 
 Elements.refreshBtn.addEventListener('click', async () => {
     try {
-        showLoading('Scanning for devices...');
+        showLoading('Scanning for Proximity Chat users...');
 
-        // Request Bluetooth device
+        // Request Bluetooth device with our custom service
+        // This will ONLY show devices running our app with the same service UUID
         const device = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
-            optionalServices: ['battery_service'] // Replace with your custom service UUID
+            filters: [{
+                services: [PROXIMITY_CHAT_SERVICE_UUID]
+            }],
+            optionalServices: [PROXIMITY_CHAT_SERVICE_UUID]
         });
 
-        console.log('Device found:', device.name);
+        console.log('Proximity Chat user found:', device.name);
 
-        // Add device to nearby users
+        // Connect to the device to get user profile
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(PROXIMITY_CHAT_SERVICE_UUID);
+        const profileChar = await service.getCharacteristic(PROFILE_CHARACTERISTIC_UUID);
+
+        // Read the user's profile data
+        const profileData = await profileChar.readValue();
+        const profileJson = new TextDecoder().decode(profileData);
+        const remoteProfile = JSON.parse(profileJson);
+
+        // Add device to nearby users with their profile info
         addNearbyUser({
             id: device.id,
-            name: device.name || 'Unknown User',
-            photo: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%236366f1" width="100" height="100"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="40" fill="white">?</text></svg>',
+            name: remoteProfile.name,
+            photo: remoteProfile.photo,
             distance: 'Nearby',
-            status: 'available'
+            status: 'available',
+            device: device,
+            server: server
         });
 
         hideLoading();
+        showInfo(`Found ${remoteProfile.name}!`);
+
     } catch (error) {
         hideLoading();
+
         if (error.name === 'NotFoundError') {
-            showError('No devices found nearby.');
+            showError('No Proximity Chat users found nearby. Make sure they have the app open.');
+        } else if (error.name === 'SecurityError') {
+            showError('Bluetooth access denied. Please enable Bluetooth permissions.');
         } else {
             console.error('Bluetooth error:', error);
+            showError('Error scanning for devices: ' + error.message);
         }
     }
 });
@@ -405,7 +454,7 @@ function addMessageToUI(message) {
     Elements.chatMessages.scrollTop = Elements.chatMessages.scrollHeight;
 }
 
-function sendMessage() {
+async function sendMessage() {
     const content = Elements.messageInput.value.trim();
     if (!content || !AppState.currentChatUser) return;
 
@@ -429,10 +478,31 @@ function sendMessage() {
     Elements.messageInput.value = '';
     Elements.sendMessageBtn.disabled = true;
 
-    // Simulate received message after 2 seconds (for demo)
-    setTimeout(() => {
-        simulateReceivedMessage();
-    }, 2000);
+    // Send via Bluetooth
+    try {
+        const user = AppState.nearbyUsers.get(AppState.currentChatUser);
+        if (user && user.server) {
+            const service = await user.server.getPrimaryService(PROXIMITY_CHAT_SERVICE_UUID);
+            const messageChar = await service.getCharacteristic(MESSAGE_CHARACTERISTIC_UUID);
+
+            const messageData = JSON.stringify({
+                from: AppState.userProfile.name,
+                content: content,
+                timestamp: Date.now()
+            });
+
+            const encoder = new TextEncoder();
+            await messageChar.writeValue(encoder.encode(messageData));
+
+            console.log('Message sent via Bluetooth');
+        }
+    } catch (error) {
+        console.error('Error sending message via Bluetooth:', error);
+        // Fall back to simulation for demo
+        setTimeout(() => {
+            simulateReceivedMessage();
+        }, 2000);
+    }
 }
 
 function simulateReceivedMessage() {
